@@ -102,7 +102,12 @@ void DrawRays3D(RenderWindow& app)
 		dof = 0;
 		float aTan = -1 / tan(rayAngle);
 
-		if (rayAngle > pi) { ray.y = (((int)pos.y >> 6) << 6) - 0.0001; ray.x = (pos.y - ray.y) * aTan + pos.x; offset.y = -64; offset.x = -offset.y * aTan; }
+		if (rayAngle > pi)
+		{
+			ray.y = (((int)pos.y >> 6) << 6) - 0.0001;
+			ray.x = (pos.y - ray.y) * aTan + pos.x;
+			offset.y = -64; offset.x = -offset.y * aTan;
+		}
 		if (rayAngle < pi)
 		{
 			ray.y = (((int)pos.y >> 6) << 6) + 64;
