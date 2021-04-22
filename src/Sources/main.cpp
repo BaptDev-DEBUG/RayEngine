@@ -32,12 +32,13 @@ void DrawPlayer(RenderWindow& app)
 
 	Vertex line[] =
 	{
-		Vertex(pos),
-		Vertex(Vector2f(pos.x + delta.x * 5, pos.y + delta.y * 5))
+		Vertex(Vector2f(pos.x + 3.75, pos.y + 3.75)),
+		Vertex(Vector2f(pos.x + delta.x * 5 + 3.75, pos.y + delta.y * 5 + 3.75))
 	};
 
-	line->color = Color::Yellow;
+	for (int i = 0; i < 2; i++) line[i].color = Color::Yellow;
 	app.draw(line, 2, Lines);
+
 }
 
 void DrawMap2D(RenderWindow& app)
@@ -48,12 +49,19 @@ void DrawMap2D(RenderWindow& app)
 	for (int y = 0; y < mapSize.y; y++)
 		for (int x = 0; x < mapSize.x; x++)
 		{
-			if (map[y * mapSize.x + x] == 1) block.setFillColor(Color::White);
-			else                             block.setFillColor(Color::Black);
+			offset.x = x * blockSize; offset.y = y * blockSize;
+			Vertex walls[] =
+			{
+				Vertex(Vector2f(offset.x + 1, offset.y + 1)),
+				Vertex(Vector2f(offset.x + 1, offset.y + blockSize - 1)),
+				Vertex(Vector2f(offset.x + blockSize - 1, offset.y + blockSize - 1)),
+				Vertex(Vector2f(offset.x + blockSize - 1, offset.y + 1)),
+			};
 
-			offset.x = x * blockSize; offset.y = y * blockSize;  
-			block.setPosition(offset.x, offset.y);                         app.draw(block);
-			block.setPosition(offset.x, offset.y + blockSize);             app.draw(block);
+			if (map[y * mapSize.x + x] == 1) walls->color = Color::White;
+			else { for (int i = 0; i < 4; i++) walls[i].color = Color::Black; }
+			app.draw(walls, 4, PrimitiveType::Quads);
+
 		}
 }
 
@@ -94,12 +102,7 @@ void DrawRays3D(RenderWindow& app)
 		dof = 0;
 		float aTan = -1 / tan(rayAngle);
 
-		if (rayAngle > pi)
-		{
-			ray.y = (((int)pos.y >> 6) << 6) - 0.0001;
-			ray.x = (pos.y - ray.y) * aTan + pos.x;
-			offset.y = -64; offset.x = -offset.y * aTan;
-		}
+		if (rayAngle > pi) { ray.y = (((int)pos.y >> 6) << 6) - 0.0001; ray.x = (pos.y - ray.y) * aTan + pos.x; offset.y = -64; offset.x = -offset.y * aTan; }
 		if (rayAngle < pi)
 		{
 			ray.y = (((int)pos.y >> 6) << 6) + 64;
@@ -115,7 +118,7 @@ void DrawRays3D(RenderWindow& app)
 
 		while (dof < 8)
 		{
-			mx = (int)(ray.x) >> 6; my = (int)(ray.y) >> 6;
+			mx = (int)(ray.x) >> 6; my = (int)(ray.y) >> 6; mp = my * mapSize.x + mx;
 			if (mp < mapSize.x * mapSize.y && map[mp] == 1) dof = 8;
 			else { ray.x += offset.x; ray.y += offset.y; dof++; }
 		}
@@ -138,7 +141,7 @@ void Display(RenderWindow& app)
 
 	DrawMap2D(app);
 	DrawPlayer(app);
-	DrawRays3D(app);
+	//DrawRays3D(app);//
 	Keys();
 	
 	app.display();
