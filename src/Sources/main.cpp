@@ -4,10 +4,12 @@ using namespace sf;
 #include <math.h>
 
 constexpr auto pi = 3.1415926536;
+constexpr auto p2 = pi/2;
+constexpr auto p3 = 3*pi/2;
 
 RectangleShape player;
 Vector2f pos, delta;
-float angle;
+float angle; float rayAngle;
 
 Vector2i mapSize(8, 8);
 int blockSize = 64;
@@ -94,12 +96,13 @@ void Keys()
 
 void DrawRays3D(RenderWindow& app)
 {
-	int mx, my, mp, dof; float rayAngle;
+	int mx, my, mp, dof;
 	Vector2f ray, offset;
 
 	for (int r = 0; r < 1; r++)
 	{
 		dof = 0;
+		rayAngle = angle;
 		float aTan = -1 / tan(rayAngle);
 
 		if (rayAngle > pi)
@@ -130,24 +133,25 @@ void DrawRays3D(RenderWindow& app)
 
 		Vertex rays[] =
 		{
-			Vertex(pos),
-			Vertex(ray)
+			Vertex(Vector2f(pos.x + 3.75, pos.y + 3.75)),
+			Vertex(Vector2f(ray.x + 3.75, ray.y + 3.75))
 		};
 
-		rays[0].color = Color::Green;
-		rays[1].color = Color::Green;
+		for (int i = 0; i < 2; i++) rays[i].color = Color::Green;
 		app.draw(rays, 2, Lines);
+		
+		
 	}
 }
 
 void Display(RenderWindow& app)
 {
 	app.clear(Color(76.5, 76.5, 76.5, 255));
+	rayAngle = angle;
 
 	DrawMap2D(app);
+	DrawRays3D(app);
 	DrawPlayer(app);
-	//DrawRays3D(app);//
-	Keys();
 	
 	app.display();
 }
@@ -177,6 +181,7 @@ int main()
 			}
 		}
 
+		Keys();
 		Display(app);
 	}
 
